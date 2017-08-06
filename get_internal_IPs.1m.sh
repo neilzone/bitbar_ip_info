@@ -88,13 +88,14 @@ fi
 
 #check if external IPv6 address exists
 
-
 if [ ! -z "$IPv6_external" ]; then
 	echo "$IPv6_external | terminal=false bash='$0' param1=copyIPv6_external"
 else
 	echo "No IPv6 address"
 fi
 
+
+# optional bit for @aaisp quota. If no login name is specified above (off by default), this section will not show
 
 if [ ! -z "$LOGIN" ]; then
 	echo "---"
