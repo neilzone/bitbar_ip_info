@@ -57,7 +57,8 @@ declare	en${COUNTER}_holder=$(networksetup -listallhardwareports | grep "en${COU
 	if [ ! -z "$(networksetup -listallhardwareports | grep "en${COUNTER}")" ]; then
 		if [ ! -z "$(ifconfig | grep "en${COUNTER}")" ]; then
 			if [ $(ifconfig en${COUNTER} | grep "status: " | awk '{print $2}') == "active" ]; then
-				echo "en${COUNTER}"
+				interface_name=$(networksetup -listallhardwareports | awk -v pattern="en${COUNTER}" ' $0 ~ pattern && $2>1 {print f} {f=$0}' | awk -F  ": " '{print $2}')
+				echo "$interface_name (en${COUNTER})"
 					IPv4=$(ifconfig en${COUNTER} | grep "inet " | awk '{print $2}')
 					if [ ! -z "$IPv4" ]; then
 						echo "$IPv4 | terminal=false bash='$0' param1=copyIP param2=$IPv4"
