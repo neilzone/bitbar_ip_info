@@ -15,13 +15,6 @@
 #PASSWORD=
 #SERVICE=
 
-# By default, this script checks for addresses assigned to the en0 (Wi-Fi) interface and the ipsec0 (IPSec) interface. If you want to monitor other interfaces, change en0 to the appropriate interface name or add other interfaces
-
-
-WiFi_status=$(ifconfig en0 | grep "status: " | awk '{print $2}')
-IPv4_internal=$(ifconfig en0 | grep "inet " | awk '{print $2}')
-IPv6_internal=$(ifconfig en0 | grep "autoconf secured " | awk '{print $2}')
-
 
 # check if there is an IPSec interface and, if so, set variables
 IPSec_status=$(ifconfig | grep "ipsec0")
@@ -58,37 +51,38 @@ fi
 echo "IP"
 echo "---"
 
-echo "Wi-Fi"
-
-if [ $WiFi_status == "active" ]; then
-
-	#check if IPv4 address exists
-
-	if [ ! -z "$IPv4_internal" ]; then
-		echo "$IPv4_internal | terminal=false bash='$0' param1=copyIP param2=$IPv4_internal"
-	else
-		echo "No IPv4 address | color=black"
+COUNTER=0
+while [  $COUNTER -lt 10 ]; do
+declare	en${COUNTER}_holder=$(networksetup -listallhardwareports | grep "en${COUNTER}")
+	if [ ! -z "$(networksetup -listallhardwareports | grep "en${COUNTER}")" ]; then
+		if [ ! -z "$(ifconfig | grep "en${COUNTER}")" ]; then
+			if [ $(ifconfig en${COUNTER} | grep "status: " | awk '{print $2}') == "active" ]; then
+				echo "en${COUNTER}"
+					IPv4=$(ifconfig en${COUNTER} | grep "inet " | awk '{print $2}')
+					if [ ! -z "$IPv4" ]; then
+						echo "$IPv4 | terminal=false bash='$0' param1=copyIP param2=$IPv4"
+					else
+						echo "No IPv4 address | color=black"
+					fi
+			IPv6="$(ifconfig en${COUNTER} | grep "autoconf secured " | awk '{print $2}')"
+					if [ ! -z "$IPv6" ]; then
+						echo "$IPv6 | terminal=false bash='$0' param1=copyIP param2=IPv6"
+					else
+						echo "No IPv6 address | color=black"
+					fi
+				echo "---"
+			fi
+		fi
 	fi
+let COUNTER=COUNTER+1
+done
 
-	#check if IPv6 address exists
-
-	if [ ! -z "$IPv6_internal" ]; then
-		echo "$IPv6_internal | terminal=false bash='$0' param1=copyIP param2=$IPv6_internal"
-	else
-		echo "No IPv6 address | color=black"
-	fi
-	
-else
-	echo "Wi-Fi inactive | color=black"
-fi	
 
 # IPSec stuff
 
-echo "---"
-echo "IPSec"
-
 if [ ! -z "$IPSec_status" ]; then
-
+		echo "---"
+		echo "IPSec"
 		if  [ ! -z "$IPSec_IPv4" ]; then
 			echo "$IPSec_IPv4 | terminal=false bash='$0' param1=copyIP param2=$IPSec_IPv4"
 		else
@@ -99,8 +93,6 @@ if [ ! -z "$IPSec_status" ]; then
 		else
 			echo "No IPv4 address | color=black"
 		fi	
-else
-	echo "IPSec inactive | color=black"
 fi
 
 echo "---"
