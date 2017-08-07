@@ -67,7 +67,7 @@ declare	en${COUNTER}_holder=$(networksetup -listallhardwareports | grep "en${COU
 					fi
 			IPv6="$(ifconfig en${COUNTER} | grep "autoconf secured " | awk '{print $2}')"
 					if [ ! -z "$IPv6" ]; then
-						echo "$IPv6 | terminal=false bash='$0' param1=copyIP param2=IPv6"
+						echo "$IPv6 | terminal=false bash='$0' param1=copyIP param2=$IPv6"
 					else
 						echo "No IPv6 address | color=black"
 					fi
