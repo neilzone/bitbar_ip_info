@@ -52,9 +52,9 @@ echo "IP"
 echo "---"
 
 COUNTER=0
-while [  $COUNTER -lt 10 ]; do
+while [  $COUNTER -lt 20 ]; do
 declare	en${COUNTER}_holder=$(networksetup -listallhardwareports | grep "en${COUNTER}")
-	if [ ! -z "$(networksetup -listallhardwareports | grep "en${COUNTER}")" ]; then
+	if [ ! -z "$(networksetup -listallhardwareports | grep -x "en${COUNTER}")" ]; then
 		if [ ! -z "$(ifconfig | grep "en${COUNTER}")" ]; then
 			if [ $(ifconfig en${COUNTER} | grep "status: " | awk '{print $2}') == "active" ]; then
 				interface_name=$(networksetup -listallhardwareports | awk -v pattern="en${COUNTER}" ' $0 ~ pattern && $2>1 {print f} {f=$0}' | awk -F  ": " '{print $2}')
